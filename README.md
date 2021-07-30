@@ -1,2 +1,2 @@
-# fhSwfJavaEETodoApp
+# JSF example app
 university project
