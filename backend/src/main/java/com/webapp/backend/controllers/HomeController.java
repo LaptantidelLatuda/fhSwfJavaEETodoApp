@@ -1,5 +1,7 @@
 package com.webapp.backend.controllers;
 
+import java.util.HashMap;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -8,9 +10,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/messages")
 public class HomeController {
     @GetMapping("/hello")
-    public String home()
+    public HashMap<String, String> home()
     {
         String answer = "Hello from mySpringBoot";
-        return answer;
+        String date = "02.08.21";
+        HashMap<String, String> map = new HashMap<>();
+        map.put(answer, date);
+        
+        return map;
     }
 }
