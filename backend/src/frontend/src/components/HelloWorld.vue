@@ -128,16 +128,17 @@ export default {
     },
     getEntries(){
       axios
-      .get("api/messages/hello")
+      .get("api/todos/all")
       .then(response =>{
-        //var myjson = response.data;
-        /*var myjson = {{ "id": "0", "titel": "ToDo-App", "description": 'Create a todo-App for the JEE module', "dueDate": '04.09.2021',"isDone" : "false" },
-                      { "id": "1", "titel": "VueJS", "description": 'Find information, read about usage, try it yourself ', "dueDate": '14.08.2021',"isDone" : "false"},
-                      { "id": "2", "titel": "Spring Boot", "description": 'Find information, read about usage, try it yourself ', "dueDate": '14.08.2021',"isDone" : "false"}}; */
-        //console.log(JSON.parse(myjson));
-       /*var myobject = JSON.parse(myjson)
-        this.msg =  myobject; */
-        this.msg = response.data;
+        this.msg = response.data[0].titel;
+        //var newarray = new Array();
+        var newarray = [];
+        response.data.forEach(element =>{
+          var newentry = {idTodo: element.idTodo, titel: element.titel, description: element.description, 
+                          dueDate: element.dueDate ,isDone : element.isDone, actions : '', edit : 'Edit'};
+          newarray.push(newentry);
+        })
+        this.todos = newarray;
         })
     },
     editTodo(index) {
