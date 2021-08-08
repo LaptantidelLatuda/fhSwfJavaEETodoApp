@@ -1,8 +1,9 @@
 <template>
+<p> {{msg}} </p>
     <h1 margin-left="3em"> ToDo App </h1>
     <!-- das submit-Ereigniss wird die Seite nicht mehr neu-->
     <form @submit.prevent="addTodo()">
-      <input type="text" id="newTodo" ref="searchbar" v-model="newTodo" name="newTodo" placeholder="Enter titel of your new ToDo-Task" autocomplete="off" ><br>
+      <input type="text" id="newTodoTitel" ref="searchbar" v-model="newTodoTitel" name="newTodoTitel" placeholder="Enter titel of your new ToDo-Task" autocomplete="off" ><br>
       <textarea id ="newTodoDescription" rows="5" cols="40"  v-model="newTodoDescription" name="newTodoDescription" placeholder="Enter description of your new ToDo-Task" autocomplete="off" ></textarea><br>
       <input id = "newTodoDueDate" type="date" min="2021-08-03" max ="2040-01-01" v-model="newTodoDueDate" name="newTodoDueDate"><br>
       <button  class="buttonPlus" >Add New ToDo-Task</button><br>
@@ -21,7 +22,7 @@
       <tbody>
         <tr v-for="row in todos" :key="row.id">
           <td v-for="col in columns" :key="col.id" ><p v-if="col !== 'edit'">{{row[col]}}</p>
-          <button  v-if="col === 'actions'" class="button"  @click="done(row.id)">Done</button>
+          <button  v-if="col === 'actions'" class="button"  @click="isDone(row.id)">Done</button>
           <button v-if="col === 'actions'" class="button"  @click="removeTodo(row.id)">Delete</button>
           <button  v-if="col === 'actions'" class="button" @click="editTodo(row.id)">{{row.edit}}</button>
           </td>
@@ -42,14 +43,15 @@
 </template>
 
 <script>
+import axios from 'axios'
 
 export default {
   name: 'HelloWorld',
   data(){
     const defaultData = [
-                          { id: 0, titel: "ToDo-App", description: 'Create a todo-App for the JEE module', duedate: '04.09.2021',done : false, actions : '', edit : 'Edit' },
-                          { id: 1, titel: "VueJS", description: 'Find information, read about usage, try it yourself ', duedate: '14.08.2021',done : false, actions : '',edit : 'Edit'},
-                          { id: 2, titel: "Spring Boot", description: 'Find information, read about usage, try it yourself ', duedate: '14.08.2021',done : false,actions : '',edit : 'Edit'}
+                          { id: 0, titel: "ToDo-App", description: 'Create a todo-App for the JEE module', dueDate: '04.09.2021',isDone : false, actions : '', edit : 'Edit' },
+                          { id: 1, titel: "VueJS", description: 'Find information, read about usage, try it yourself ', dueDate: '14.08.2021',isDone : false, actions : '',edit : 'Edit'},
+                          { id: 2, titel: "Spring Boot", description: 'Find information, read about usage, try it yourself ', dueDate: '14.08.2021',isDone : false,actions : '',edit : 'Edit'}
                         ];
     
     // Zuweisung von dem Wert funktioniert nicht ...
@@ -73,7 +75,13 @@ export default {
       editing : false,
       edit : 'Edit',
       todos: defaultData,
-      newTodo : '',
+      newTodoTitel : '',
+      newToDoEntry: {
+        titel : '',
+        description : '',
+        dueDate : '',
+        isDone: ''
+      },
       newTodoDescription : '',
       newTodoDueDate : '',
       today : newDay
@@ -87,14 +95,17 @@ export default {
       return Object.keys(this.todos[0])
     }
   },
-  mounted() {
+  mounted(){
+    this.getEntries()
+  },
+ /*  mounted() {
      fetch("/api/messages/hello")
               .then((response) => response.text())
               .then((data) => { this.msg=data });
      
      //this.$refs.searchbar.$el.focus();
-    
-  },
+     
+  } ,*/
   methods :{
           "sortTable": function sortTable(col) {
                           if (this.sortColumn === col) {
@@ -115,19 +126,33 @@ export default {
                             return 0;
                           })
     },
+    getEntries(){
+      axios
+      .get("api/messages/hello")
+      .then(response =>{
+        //var myjson = response.data;
+        /*var myjson = {{ "id": "0", "titel": "ToDo-App", "description": 'Create a todo-App for the JEE module', "dueDate": '04.09.2021',"isDone" : "false" },
+                      { "id": "1", "titel": "VueJS", "description": 'Find information, read about usage, try it yourself ', "dueDate": '14.08.2021',"isDone" : "false"},
+                      { "id": "2", "titel": "Spring Boot", "description": 'Find information, read about usage, try it yourself ', "dueDate": '14.08.2021',"isDone" : "false"}}; */
+        //console.log(JSON.parse(myjson));
+       /*var myobject = JSON.parse(myjson)
+        this.msg =  myobject; */
+        this.msg = response.data;
+        })
+    },
     editTodo(index) {
       
-      // this.newTodo enthält den neuen Text
+      // this.newTodoTitel enthält den neuen Text
       // index enthält die id, an der der Eintrag in der DB gelöscht werden soll
 
       this.editing = !this.editing;
 
       if(this.editing){
         this.todos[this.todos.findIndex(e =>e.id===index)].edit = "Save";
-        this.newTodo = this.todos[this.todos.findIndex(e =>e.id===index)].titel;
+        this.newTodoTitel = this.todos[this.todos.findIndex(e =>e.id===index)].titel;
         this.newTodoDescription = this.todos[this.todos.findIndex(e =>e.id===index)].description;
 
-        var dateFormatEntries =  this.todos[this.todos.findIndex(e =>e.id===index)].duedate.split('.');
+        var dateFormatEntries =  this.todos[this.todos.findIndex(e =>e.id===index)].dueDate.split('.');
         this.newTodoDueDate = dateFormatEntries[2] + "-" + dateFormatEntries[1]+ "-" + dateFormatEntries[0];
       } else {
         this.todos[this.todos.findIndex(e =>e.id===index)].edit = "Edit";
@@ -141,52 +166,78 @@ export default {
       if (this.newTodoDueDate > this.today){
         var dateFormatEntries =  this.newTodoDueDate.split('-');
         var dateFormat = dateFormatEntries[2] + "." + dateFormatEntries[1]+ "." + dateFormatEntries[0];
-        console.log("Edit: newtitel =" + this.newTodo+ " + newdescription = "+ this.newTodoDescription+ " + newduedate = " + dateFormat);
+
+        this.newToDoEntry.titel = this.newTodoTitel;
+        this.newToDoEntry.description = this.newTodoDescription;
+        this.newToDoEntry.dueDate = dateFormat;
+        this.newToDoEntry.isDone = this.todos[index].isDone;
+
+        axios
+        .put("api/messages/todo/" + this.todos[index].id , this.newToDoEntry)
+
+        console.log("Edit: newtitel =" + this.newTodoTitel+ " + newdescription = "+ this.newTodoDescription+ " + newduedate = " + dateFormat);
         console.log(this.todos[index].id);
       } else console.log(" No entries for past time allowed ")
       
       this.editing = !this.editing;
 
-      this.newTodo =  '',
+      this.newTodoTitel =  '',
       this.newTodoDescription = '',
       this.newTodoDueDate = ''
 
       console.log()
     },
     addTodo () {
-      if (this.newTodo&&this.newTodoDescription&&this.newTodoDueDate){
+      if (this.newTodoTitel&&this.newTodoDescription&&this.newTodoDueDate){
         console.log(this.today);
         if (this.newTodoDueDate > this.today){
           var dateFormatEntries =  this.newTodoDueDate.split('-');
           var dateFormat = dateFormatEntries[2] + "." + dateFormatEntries[1]+ "." + dateFormatEntries[0];
-          console.log("new Entry :"+ this.newTodo+" "+this.newTodoDescription+" "+dateFormat);
+          console.log("new Entry :"+ this.newTodoTitel+" "+this.newTodoDescription+" "+dateFormat);
 
-          this.newTodo =  '',
+          this.newToDoEntry.titel = this.newTodoTitel;
+          this.newToDoEntry.description = this.newTodoDescription;
+          this.newToDoEntry.dueDate = dateFormat;
+          this.newToDoEntry.isDone = 'false';
+
+          axios
+            .post("/api/messages/todo",this.newToDoEntry)
+            .then((response)=>{
+              console.log(response);
+            })
+            .catch((error)=>console.log(error));
+
+
+          this.newTodoTitel =  '',
           this.newTodoDescription = '',
           this.newTodoDueDate = ''
-          //this.newTodo enthält den neuen Text
+          //this.newTodoTitel enthält den neuen Text
 
         /* this.todos.push({
           id: this.todos.length,
-          titel: this.newTodo,
+          titel: this.newTodoTitel,
           description: this.newTodoDescription,
-          duedate: this.newTodoDueDate,
-          done: false 
+          dueDate: this.newTodoDueDate,
+          isDone: false 
         }); */
         } else console.log(" No entries for past time allowed ")
       }
       
     },
     removeTodo (index) {
+
+      axios
+      .delete("api/messages/todo/"+index);
+            
       console.log(index);
       // index enthält die id, an der der Eintrag in der DB gelöscht werden soll
 
       //this.todos.splice(index, 1);
     }, 
-    done(index){
+    isDone(index){
       // finde die richtige id zum index und verändere dort den Wert
-      this.todos[this.todos.findIndex(e =>e.id===index)].done = !this.todos[this.todos.findIndex(e =>e.id===index)].done;
-      console.log(index + " todo is done " + this.todos[this.todos.findIndex(e =>e.id===index)].done);
+      this.todos[this.todos.findIndex(e =>e.id===index)].isDone = !this.todos[this.todos.findIndex(e =>e.id===index)].isDone;
+      console.log(index + " todo is isDone " + this.todos[this.todos.findIndex(e =>e.id===index)].isDone);
       
     }
   }
