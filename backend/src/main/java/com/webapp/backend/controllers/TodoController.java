@@ -7,6 +7,7 @@ import com.webapp.backend.models.Todo;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -51,13 +52,29 @@ public class TodoController {
     }
 
     @PutMapping(path = "/{id}")
-    public ResponseEntity<Integer> Update(@PathVariable long id, @RequestBody Todo newTodo) {
+    public ResponseEntity<Integer> Update(@PathVariable int id, @RequestBody Todo newTodo) {
         Todo targetTodo = todoMapper.GetTodo(id);
         if (targetTodo == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
 
+        newTodo.setIdTodo(id);
         Integer affectedRows = todoMapper.UpdateTodo(newTodo);
+        if (affectedRows == 1) {
+            return new ResponseEntity<>(affectedRows, HttpStatus.OK);
+        } else {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @DeleteMapping(path = "/{id}")
+    public ResponseEntity<Integer> Delete(@PathVariable int id) {
+        Todo targetTodo = todoMapper.GetTodo(id);
+        if (targetTodo == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
+
+        Integer affectedRows = todoMapper.deleteVillage(id);
         if (affectedRows == 1) {
             return new ResponseEntity<>(affectedRows, HttpStatus.OK);
         } else {

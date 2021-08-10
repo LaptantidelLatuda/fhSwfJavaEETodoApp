@@ -23,9 +23,10 @@ public interface TodoMapper {
     @Insert("INSERT into Todos(titel, description, dueDate, isDone) VALUES(#{titel}, #{description}, #{dueDate}, #{isDone}) ")
     Integer AddTodo(Todo newTodo);
 
-    @Update("UPDATE Todos SET titel=#{titel}, description=#{description}, dueDate=#{dueDate} WHERE idTodo=#{idTodo}")
+    @Options(useGeneratedKeys = true, keyProperty = "idTodo", keyColumn = "idTodo")
+    @Update("UPDATE Todos SET titel=#{titel}, description=#{description}, dueDate=#{dueDate}, isDone=#{isDone} WHERE idTodo=#{idTodo}")
     Integer UpdateTodo(Todo newTodo);
 
     @Delete("DELETE FROM Todos WHERE idTodo =#{id}")
-    Integer DeleteTodo(long id);
+	Integer deleteVillage(int id);
 }
