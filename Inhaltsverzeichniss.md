@@ -1,21 +1,22 @@
-- Einleitung 
+- Einleitung (Katja 1 Seite)
   - Zielsetzung
   - Gliederung / Aufteilung / Abgrenzung
-- Fachkonzept
+- Fachkonzept (Katja 2-3 Seiten)
     - Anforderungen / Use-Cases
     - Mock-Up / Wireframes für UI
 - Umsetzung
-    - Architektur
-    - Backend
+    - Architektur (Katja 2-3 Seiten)
+    - Backend (Tobi)
       - REST API
-      - MyBatis als Mapper
+      - MyBatis als Mapper 
         - Framework vorstellen
         - Umsetzung im Projekt
         - Unterschied ORM – Mapping Framework
-      - Datenbank
-   - Frontend
+      - Datenbank (Katja 1 Seite)
+   - Frontend (Katja 4 Seiten)
      -  Vue JS 
-- Deployment 
+- Testing (Tobi 0.5-1 Seite)
+- Deployment (Tobi)
   - Docker
   - Spring Boot auf WildFly deployen
-- Fazit
+- Fazit (Katja 1 Seite)
