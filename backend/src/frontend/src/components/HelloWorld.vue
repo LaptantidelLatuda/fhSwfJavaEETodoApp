@@ -3,16 +3,16 @@
     <h1 margin-left="3em"> ToDo App </h1>
     <!-- das submit-Ereigniss wird die Seite nicht mehr neu-->
     <form @submit.prevent="addTodo()">
-      <input type="text" id="newTodoTitel" ref="searchbar" v-model="newTodoTitel" name="newTodoTitel" placeholder="Enter titel of your new ToDo-Task" autocomplete="off" ><br>
-      <textarea id ="newTodoDescription" rows="5" cols="40"  v-model="newTodoDescription" name="newTodoDescription" placeholder="Enter description of your new ToDo-Task" autocomplete="off" ></textarea><br>
-      <input id = "newTodoDueDate" type="date" min="2021-08-03" max ="2040-01-01" v-model="newTodoDueDate" name="newTodoDueDate"><br>
+      <input type="text" idTodo="newTodoTitel" ref="searchbar" v-model="newTodoTitel" name="newTodoTitel" placeholder="Enter titel of your new ToDo-Task" autocomplete="off" ><br>
+      <textarea idTodo ="newTodoDescription" rows="5" cols="40"  v-model="newTodoDescription" name="newTodoDescription" placeholder="Enter description of your new ToDo-Task" autocomplete="off" ></textarea><br>
+      <input idTodo = "newTodoDueDate" type="date" min="2021-08-03" max ="2040-01-01" v-model="newTodoDueDate" name="newTodoDueDate"><br>
       <button  class="buttonPlus" >Add New ToDo-Task</button><br>
     </form >
     <h1>ToDo List</h1>
     <table> 
       <thead>
         <tr>
-          <th v-for="col in (columns)" :key= "col.id" v-on:click="sortTable(col)">
+          <th v-for="col in (columns)" :key= "col.idTodo" v-on:click="sortTable(col)">
             <p v-if="col !== 'edit'">{{col}}</p>
               <div class="arrow" v-if="col == sortColumn" v-bind:class="ascending ? 'arrow_down' : 'arrow_up'"></div>
             
@@ -20,11 +20,11 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="row in todos" :key="row.id">
-          <td v-for="col in columns" :key="col.id" ><p v-if="col !== 'edit'">{{row[col]}}</p>
-          <button  v-if="col === 'actions'" class="button"  @click="isDone(row.id)">Done</button>
-          <button v-if="col === 'actions'" class="button"  @click="removeTodo(row.id)">Delete</button>
-          <button  v-if="col === 'actions'" class="button" @click="editTodo(row.id)">{{row.edit}}</button>
+        <tr v-for="row in todos" :key="row.idTodo">
+          <td v-for="col in columns" :key="col.idTodo" ><p v-if="col !== 'edit'">{{row[col]}}</p>
+          <button  v-if="col === 'actions'" class="button"  @click="isDone(row.idTodo)">Done</button>
+          <button v-if="col === 'actions'" class="button"  @click="removeTodo(row.idTodo)">Delete</button>
+          <button  v-if="col === 'actions'" class="button" @click="editTodo(row.idTodo)">{{row.edit}}</button>
           </td>
         </tr>
       </tbody>
@@ -32,7 +32,7 @@
     <h4 v-if="todos.length === 0">Empty list.</h4>
     <!--<button @click= "showText =!showText"> Toggle Text</button>
     <label for ="name"> Name: </label>
-    <input type = "text" id ="name" name ="name" v-model="name"/>
+    <input type = "text" idTodo ="name" name ="name" v-model="name"/>
     <p v-show="name != ''"> Hello, {{name}}</p>
     <p v-show="showText"> this is some Text on my page. </p>
     <ul>
@@ -49,9 +49,9 @@ export default {
   name: 'HelloWorld',
   data(){
     const defaultData = [
-                          { id: 0, titel: "ToDo-App", description: 'Create a todo-App for the JEE module', dueDate: '04.09.2021',isDone : false, actions : '', edit : 'Edit' },
-                          { id: 1, titel: "VueJS", description: 'Find information, read about usage, try it yourself ', dueDate: '14.08.2021',isDone : false, actions : '',edit : 'Edit'},
-                          { id: 2, titel: "Spring Boot", description: 'Find information, read about usage, try it yourself ', dueDate: '14.08.2021',isDone : false,actions : '',edit : 'Edit'}
+                          { idTodo: 0, titel: "ToDo-App", description: 'Create a todo-App for the JEE module', dueDate: '04.09.2021',isDone : false, actions : '', edit : 'Edit' },
+                          { idTodo: 1, titel: "VueJS", description: 'Find information, read about usage, try it yourself ', dueDate: '14.08.2021',isDone : false, actions : '',edit : 'Edit'},
+                          { idTodo: 2, titel: "Spring Boot", description: 'Find information, read about usage, try it yourself ', dueDate: '14.08.2021',isDone : false,actions : '',edit : 'Edit'}
                         ];
     
     // Zuweisung von dem Wert funktioniert nicht ...
@@ -71,7 +71,7 @@ export default {
       //showText : true, 
       //name: '',
       ascending: true,
-      sortColumn: 'id',
+      sortColumn: 'idTodo',
       editing : false,
       edit : 'Edit',
       todos: defaultData,
@@ -144,20 +144,20 @@ export default {
     editTodo(index) {
       
       // this.newTodoTitel enthält den neuen Text
-      // index enthält die id, an der der Eintrag in der DB gelöscht werden soll
+      // index enthält die idTodo, an der der Eintrag in der DB gelöscht werden soll
 
       this.editing = !this.editing;
 
       if(this.editing){
-        this.todos[this.todos.findIndex(e =>e.id===index)].edit = "Save";
-        this.newTodoTitel = this.todos[this.todos.findIndex(e =>e.id===index)].titel;
-        this.newTodoDescription = this.todos[this.todos.findIndex(e =>e.id===index)].description;
+        this.todos[this.todos.findIndex(e =>e.idTodo===index)].edit = "Save";
+        this.newTodoTitel = this.todos[this.todos.findIndex(e =>e.idTodo===index)].titel;
+        this.newTodoDescription = this.todos[this.todos.findIndex(e =>e.idTodo===index)].description;
 
-        var dateFormatEntries =  this.todos[this.todos.findIndex(e =>e.id===index)].dueDate.split('.');
-        this.newTodoDueDate = dateFormatEntries[2] + "-" + dateFormatEntries[1]+ "-" + dateFormatEntries[0];
+       /*  var dateFormatEntries =  this.todos[this.todos.findIndex(e =>e.idTodo===index)].dueDate.split('.');
+        this.newTodoDueDate = dateFormatEntries[2] + "-" + dateFormatEntries[1]+ "-" + dateFormatEntries[0] */
       } else {
-        this.todos[this.todos.findIndex(e =>e.id===index)].edit = "Edit";
-        this.saveChanges(this.todos.findIndex(e =>e.id===index));
+        this.todos[this.todos.findIndex(e =>e.idTodo===index)].edit = "Edit";
+        this.saveChanges(this.todos.findIndex(e =>e.idTodo===index));
         this.editing = !this.editing;
       }
      
@@ -165,19 +165,19 @@ export default {
     },
     saveChanges(index){
       if (this.newTodoDueDate > this.today){
-        var dateFormatEntries =  this.newTodoDueDate.split('-');
-        var dateFormat = dateFormatEntries[2] + "." + dateFormatEntries[1]+ "." + dateFormatEntries[0];
+       /*  var dateFormatEntries =  this.newTodoDueDate.split('-');
+        var dateFormat = dateFormatEntries[2] + "." + dateFormatEntries[1]+ "." + dateFormatEntries[0]; */
 
         this.newToDoEntry.titel = this.newTodoTitel;
         this.newToDoEntry.description = this.newTodoDescription;
-        this.newToDoEntry.dueDate = dateFormat;
+        this.newToDoEntry.dueDate = this.newTodoDueDate;
         this.newToDoEntry.isDone = this.todos[index].isDone;
 
         axios
-        .put("api/messages/todo/" + this.todos[index].id , this.newToDoEntry)
+        .put("api/messages/todo/" + this.todos[index].idTodo , this.newToDoEntry)
 
-        console.log("Edit: newtitel =" + this.newTodoTitel+ " + newdescription = "+ this.newTodoDescription+ " + newduedate = " + dateFormat);
-        console.log(this.todos[index].id);
+        console.log("Edit: newtitel =" + this.newTodoTitel+ " + newdescription = "+ this.newTodoDescription+ " + newduedate = " + this.newTodoDueDate);
+        console.log(this.todos[index].idTodo);
       } else console.log(" No entries for past time allowed ")
       
       this.editing = !this.editing;
@@ -192,13 +192,13 @@ export default {
       if (this.newTodoTitel&&this.newTodoDescription&&this.newTodoDueDate){
         console.log(this.today);
         if (this.newTodoDueDate > this.today){
-          var dateFormatEntries =  this.newTodoDueDate.split('-');
+          /* var dateFormatEntries =  this.newTodoDueDate.split('-');
           var dateFormat = dateFormatEntries[2] + "." + dateFormatEntries[1]+ "." + dateFormatEntries[0];
-          console.log("new Entry :"+ this.newTodoTitel+" "+this.newTodoDescription+" "+dateFormat);
+          console.log("new Entry :"+ this.newTodoTitel+" "+this.newTodoDescription+" "+dateFormat); */
 
           this.newToDoEntry.titel = this.newTodoTitel;
           this.newToDoEntry.description = this.newTodoDescription;
-          this.newToDoEntry.dueDate = dateFormat;
+          this.newToDoEntry.dueDate = this.newTodoDueDate;
           this.newToDoEntry.isDone = 'false';
 
           axios
@@ -215,7 +215,7 @@ export default {
           //this.newTodoTitel enthält den neuen Text
 
         /* this.todos.push({
-          id: this.todos.length,
+          idTodo: this.todos.length,
           titel: this.newTodoTitel,
           description: this.newTodoDescription,
           dueDate: this.newTodoDueDate,
@@ -231,14 +231,14 @@ export default {
       .delete("api/messages/todo/"+index);
             
       console.log(index);
-      // index enthält die id, an der der Eintrag in der DB gelöscht werden soll
+      // index enthält die idTodo, an der der Eintrag in der DB gelöscht werden soll
 
       //this.todos.splice(index, 1);
     }, 
     isDone(index){
-      // finde die richtige id zum index und verändere dort den Wert
-      this.todos[this.todos.findIndex(e =>e.id===index)].isDone = !this.todos[this.todos.findIndex(e =>e.id===index)].isDone;
-      console.log(index + " todo is isDone " + this.todos[this.todos.findIndex(e =>e.id===index)].isDone);
+      // finde die richtige idTodo zum index und verändere dort den Wert
+      this.todos[this.todos.findIndex(e =>e.idTodo===index)].isDone = !this.todos[this.todos.findIndex(e =>e.idTodo===index)].isDone;
+      console.log(index + " todo is isDone " + this.todos[this.todos.findIndex(e =>e.idTodo===index)].isDone);
       
     }
   }
